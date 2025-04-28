@@ -1,0 +1,532 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garen Ultimate Damage Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0a1428;
+            color: #f0e6d2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .garen-bg {
+            background-image: linear-gradient(rgba(10, 20, 40, 0.8), rgba(10, 20, 40, 0.9)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23c8aa6e' d='M50 5L60 20L80 25L65 40L70 60L50 50L30 60L35 40L20 25L40 20L50 5Z'/%3E%3C/svg%3E");
+            background-size: 300px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .demacia-border {
+            border: 2px solid #c8aa6e;
+        }
+        .demacia-button {
+            background-color: #0a1428;
+            border: 2px solid #c8aa6e;
+            color: #c8aa6e;
+            transition: all 0.3s;
+        }
+        .demacia-button:hover {
+            background-color: #c8aa6e;
+            color: #0a1428;
+        }
+        .slider {
+            -webkit-appearance: none;
+            height: 10px;
+            border-radius: 5px;
+            background: #1e2328;
+            outline: none;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #c8aa6e;
+            cursor: pointer;
+        }
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #c8aa6e;
+            cursor: pointer;
+        }
+        .item-checkbox:checked + .item-label {
+            background-color: #c8aa6e;
+            color: #0a1428;
+            border-color: #c8aa6e;
+        }
+        .item-label {
+            background-color: #1e2328;
+            border: 2px solid #785a28;
+            transition: all 0.3s;
+        }
+        input[type="number"], input[type="text"] {
+            background-color: #1e2328;
+            border: 2px solid #785a28;
+            color: #f0e6d2;
+        }
+        input[type="number"]:focus, input[type="text"]:focus {
+            border-color: #c8aa6e;
+            outline: none;
+        }
+        .animate-pulse {
+            animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="garen-bg p-8 rounded-lg shadow-lg demacia-border">
+            <h1 class="text-4xl font-bold text-center text-yellow-600 mb-6">DEMACIAN JUSTICE</h1>
+            <h2 class="text-xl text-center mb-8">Garen Ultimate Damage Calculator</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Garen Stats Section -->
+                <div class="bg-gray-900 bg-opacity-80 p-6 rounded-lg demacia-border">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-600">Garen Stats</h3>
+                    
+                    <!-- Ultimate Level -->
+                    <div class="mb-6">
+                        <label class="block mb-2 font-semibold">Ultimate Level:</label>
+                        <div class="flex space-x-4">
+                            <button id="ult-1" class="demacia-button px-4 py-2 rounded-md w-full">Level 1</button>
+                            <button id="ult-2" class="demacia-button px-4 py-2 rounded-md w-full">Level 2</button>
+                            <button id="ult-3" class="demacia-button px-4 py-2 rounded-md w-full">Level 3</button>
+                        </div>
+                        <div class="flex justify-between mt-2 text-xs text-gray-400">
+                            <span>Base: 150 (25% missing)</span>
+                            <span>Base: 300 (30% missing)</span>
+                            <span>Base: 450 (35% missing)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Items -->
+                    <div class="mb-6">
+                        <label class="block mb-2 font-semibold">Items & Runes:</label>
+                        <div class="grid grid-cols-1 gap-3">
+                            <div>
+                                <input type="checkbox" id="collector" class="hidden item-checkbox">
+                                <label for="collector" class="block w-full p-3 rounded-md cursor-pointer item-label flex items-center">
+                                    <span class="w-5 h-5 inline-block border-2 border-yellow-600 rounded mr-3 flex-shrink-0"></span>
+                                    <span>Collector (Execute below 5% health)</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="axiom" class="hidden item-checkbox">
+                                <label for="axiom" class="block w-full p-3 rounded-md cursor-pointer item-label flex items-center">
+                                    <span class="w-5 h-5 inline-block border-2 border-yellow-600 rounded mr-3 flex-shrink-0"></span>
+                                    <span>Axiom Arcanist (14% increased ultimate damage)</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="pta" class="hidden item-checkbox">
+                                <label for="pta" class="block w-full p-3 rounded-md cursor-pointer item-label flex items-center">
+                                    <span class="w-5 h-5 inline-block border-2 border-yellow-600 rounded mr-3 flex-shrink-0"></span>
+                                    <span>Press the Attack (8% increased damage)</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="shojin" class="hidden item-checkbox">
+                                <label for="shojin" class="block w-full p-3 rounded-md cursor-pointer item-label flex items-center">
+                                    <span class="w-5 h-5 inline-block border-2 border-yellow-600 rounded mr-3 flex-shrink-0"></span>
+                                    <span>Spear of Shojin (3% damage per stack)</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="last-stand" class="hidden item-checkbox">
+                                <label for="last-stand" class="block w-full p-3 rounded-md cursor-pointer item-label flex items-center">
+                                    <span class="w-5 h-5 inline-block border-2 border-yellow-600 rounded mr-3 flex-shrink-0"></span>
+                                    <span>Last Stand (Up to 11% damage when low health)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Shojin Stacks -->
+                    <div class="mb-6 bg-gray-800 p-4 rounded-lg" id="shojin-stacks-container" style="display: none;">
+                        <label class="block mb-2 font-semibold">Shojin Stacks: <span id="shojin-stacks-value">0</span></label>
+                        <input type="range" min="0" max="6" value="0" class="slider w-full" id="shojin-stacks">
+                        <div class="flex justify-between mt-1 text-xs text-gray-400">
+                            <span>0</span>
+                            <span>1</span>
+                            <span>2</span>
+                            <span>3</span>
+                            <span>4</span>
+                            <span>5</span>
+                            <span>6</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Last Stand -->
+                    <div class="mb-4 bg-gray-800 p-4 rounded-lg" id="last-stand-options" style="display: none;">
+                        <h4 class="font-semibold mb-3">Last Stand Settings</h4>
+                        <div class="mb-4">
+                            <label class="block mb-1">Max Health: <span id="max-health-value">1000</span></label>
+                            <input type="range" min="500" max="5000" value="1000" class="slider w-full" id="max-health">
+                            <div class="flex justify-between mt-1 text-xs text-gray-400">
+                                <span>500</span>
+                                <span>2750</span>
+                                <span>5000</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block mb-1">Current Health: <span id="current-health-value">1000</span> (<span id="health-percent">100</span>%)</label>
+                            <input type="range" min="0" max="1000" value="1000" class="slider w-full" id="current-health">
+                            <div class="flex justify-between mt-1 text-xs text-gray-400">
+                                <span>0%</span>
+                                <span>50%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enemy Stats Section -->
+                <div class="bg-gray-900 bg-opacity-80 p-6 rounded-lg demacia-border">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-600">Enemy Stats</h3>
+                    
+                    <!-- Enemy Max Health -->
+                    <div class="mb-4">
+                        <label class="block mb-2 font-semibold">Enemy Max Health:</label>
+                        <input type="number" id="enemy-health-input" class="w-full p-3 rounded-md" value="2000" min="1">
+                        <p class="text-xs text-gray-400 mt-1">Enter any value for enemy health</p>
+                    </div>
+                    
+                    <!-- Enemy Current Health -->
+                    <div class="mb-6">
+                        <label class="block mb-2 font-semibold">Enemy Current Health:</label>
+                        <input type="number" id="enemy-current-health-input" class="w-full p-3 rounded-md" value="1000" min="0">
+                        <p class="text-xs text-gray-400 mt-1">Enter current enemy health to calculate missing health damage</p>
+                        <div class="mt-2 bg-gray-800 rounded-lg p-2">
+                            <div class="h-4 bg-gray-700 rounded-full overflow-hidden">
+                                <div id="enemy-health-bar" class="h-full bg-red-600" style="width: 50%"></div>
+                            </div>
+                            <p class="text-xs text-center mt-1"><span id="enemy-health-percent">50</span>% health</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Results -->
+                    <div class="mt-8">
+                        <h3 class="text-xl font-bold mb-4 text-yellow-600">Results</h3>
+                        <div class="bg-gray-800 p-4 rounded-lg mb-6">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-gray-400">Base Damage:</p>
+                                    <p class="text-xl font-bold" id="base-damage">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400">Missing Health Damage:</p>
+                                    <p class="text-xl font-bold" id="missing-health-damage">0</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-gray-700">
+                                <p class="text-gray-400">Total Damage:</p>
+                                <p class="text-2xl font-bold text-yellow-600" id="total-damage">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-6 rounded-lg text-center">
+                            <p class="text-lg mb-2">Will the enemy be executed?</p>
+                            <p class="text-4xl font-bold" id="execute-result">CALCULATING...</p>
+                            <p class="text-sm mt-2" id="execute-details"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <button id="calculate" class="demacia-button px-8 py-3 rounded-md text-xl font-bold">CALCULATE JUSTICE</button>
+            </div>
+            
+            <div class="mt-6 text-center text-sm text-gray-400">
+              <p>DEMACIA!! | Developed by <a href="https://github.com/ricardomdn" class="text-gray-300 underline" target="_blank" rel="noopener noreferrer">Ricardo</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variables
+            let ultLevel = 1;
+            let hasCollector = false;
+            let hasAxiom = false;
+            let hasPTA = false;
+            let hasLastStand = false;
+            let hasShojin = false;
+            let shojinStacks = 0;
+            let maxHealth = 1000;
+            let currentHealth = 1000;
+            let enemyMaxHealth = 2000;
+            let enemyCurrentHealth = 1000;
+            
+            // Base damage values for Garen's ultimate
+            const baseDamage = [150, 300, 450];
+            const missingHealthPercent = [0.25, 0.30, 0.35]; // Correct scaling percentages
+            const axiomDamageBonus = 0.14; // 14% increased ultimate damage
+            
+            // DOM Elements
+            const ultButtons = [
+                document.getElementById('ult-1'),
+                document.getElementById('ult-2'),
+                document.getElementById('ult-3')
+            ];
+            
+            const collectorCheckbox = document.getElementById('collector');
+            const axiomCheckbox = document.getElementById('axiom');
+            const ptaCheckbox = document.getElementById('pta');
+            const lastStandCheckbox = document.getElementById('last-stand');
+            const shojinCheckbox = document.getElementById('shojin');
+            
+            const shojinStacksContainer = document.getElementById('shojin-stacks-container');
+            const shojinStacksSlider = document.getElementById('shojin-stacks');
+            const shojinStacksValue = document.getElementById('shojin-stacks-value');
+            
+            const lastStandOptions = document.getElementById('last-stand-options');
+            const maxHealthSlider = document.getElementById('max-health');
+            const maxHealthValue = document.getElementById('max-health-value');
+            const currentHealthSlider = document.getElementById('current-health');
+            const currentHealthValue = document.getElementById('current-health-value');
+            const healthPercent = document.getElementById('health-percent');
+            
+            const enemyHealthInput = document.getElementById('enemy-health-input');
+            const enemyCurrentHealthInput = document.getElementById('enemy-current-health-input');
+            const enemyHealthBar = document.getElementById('enemy-health-bar');
+            const enemyHealthPercent = document.getElementById('enemy-health-percent');
+            
+            const baseDamageOutput = document.getElementById('base-damage');
+            const missingHealthDamageOutput = document.getElementById('missing-health-damage');
+            const totalDamageOutput = document.getElementById('total-damage');
+            const executeResult = document.getElementById('execute-result');
+            const executeDetails = document.getElementById('execute-details');
+            
+            const calculateButton = document.getElementById('calculate');
+            
+            // Custom checkbox styling
+            const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const label = this.nextElementSibling;
+                    const checkmark = label.querySelector('span:first-child');
+                    
+                    if (this.checked) {
+                        checkmark.innerHTML = '✓';
+                        checkmark.classList.add('bg-yellow-600', 'flex', 'items-center', 'justify-center', 'text-gray-900', 'font-bold');
+                    } else {
+                        checkmark.innerHTML = '';
+                        checkmark.classList.remove('bg-yellow-600', 'flex', 'items-center', 'justify-center', 'text-gray-900', 'font-bold');
+                    }
+                    
+                    // Handle specific checkboxes
+                    if (this.id === 'shojin') {
+                        hasShojin = this.checked;
+                        shojinStacksContainer.style.display = hasShojin ? 'block' : 'none';
+                    } else if (this.id === 'last-stand') {
+                        hasLastStand = this.checked;
+                        lastStandOptions.style.display = hasLastStand ? 'block' : 'none';
+                    } else if (this.id === 'collector') {
+                        hasCollector = this.checked;
+                    } else if (this.id === 'axiom') {
+                        hasAxiom = this.checked;
+                    } else if (this.id === 'pta') {
+                        hasPTA = this.checked;
+                    }
+                });
+            });
+            
+            // Event Listeners
+            ultButtons.forEach((button, index) => {
+                button.addEventListener('click', () => {
+                    ultButtons.forEach(btn => btn.classList.remove('bg-yellow-600', 'text-gray-900'));
+                    button.classList.add('bg-yellow-600', 'text-gray-900');
+                    ultLevel = index + 1;
+                });
+            });
+            
+            // Set default selected ultimate level
+            ultButtons[0].classList.add('bg-yellow-600', 'text-gray-900');
+            
+            shojinStacksSlider.addEventListener('input', () => {
+                shojinStacks = parseInt(shojinStacksSlider.value);
+                shojinStacksValue.textContent = shojinStacks;
+            });
+            
+            maxHealthSlider.addEventListener('input', () => {
+                maxHealth = parseInt(maxHealthSlider.value);
+                maxHealthValue.textContent = maxHealth;
+                
+                // Update current health max value
+                currentHealthSlider.max = maxHealth;
+                if (parseInt(currentHealthSlider.value) > maxHealth) {
+                    currentHealthSlider.value = maxHealth;
+                    currentHealth = maxHealth;
+                    currentHealthValue.textContent = currentHealth;
+                }
+                
+                // Update health percentage
+                updateHealthPercentage();
+            });
+            
+            currentHealthSlider.addEventListener('input', () => {
+                currentHealth = parseInt(currentHealthSlider.value);
+                currentHealthValue.textContent = currentHealth;
+                
+                // Update health percentage
+                updateHealthPercentage();
+            });
+            
+            enemyHealthInput.addEventListener('input', () => {
+                if (enemyHealthInput.value > 0) {
+                    enemyMaxHealth = parseInt(enemyHealthInput.value);
+                    
+                    // Update enemy current health if it's now greater than max health
+                    if (enemyCurrentHealth > enemyMaxHealth) {
+                        enemyCurrentHealth = enemyMaxHealth;
+                        enemyCurrentHealthInput.value = enemyCurrentHealth;
+                    }
+                    
+                    // Update enemy health bar
+                    updateEnemyHealthBar();
+                }
+            });
+            
+            enemyCurrentHealthInput.addEventListener('input', () => {
+                if (enemyCurrentHealthInput.value >= 0) {
+                    enemyCurrentHealth = parseInt(enemyCurrentHealthInput.value);
+                    
+                    // Ensure current health doesn't exceed max health
+                    if (enemyCurrentHealth > enemyMaxHealth) {
+                        enemyCurrentHealth = enemyMaxHealth;
+                        enemyCurrentHealthInput.value = enemyCurrentHealth;
+                    }
+                    
+                    // Update enemy health bar
+                    updateEnemyHealthBar();
+                }
+            });
+            
+            calculateButton.addEventListener('click', calculateDamage);
+            
+            // Helper Functions
+            function updateHealthPercentage() {
+                const percent = Math.round((currentHealth / maxHealth) * 100);
+                healthPercent.textContent = percent;
+            }
+            
+            function updateEnemyHealthBar() {
+                const percent = Math.round((enemyCurrentHealth / enemyMaxHealth) * 100);
+                enemyHealthBar.style.width = percent + '%';
+                enemyHealthPercent.textContent = percent;
+            }
+            
+            function calculateDamage() {
+                // Get enemy health from input
+                enemyMaxHealth = parseInt(enemyHealthInput.value) || 2000;
+                enemyCurrentHealth = parseInt(enemyCurrentHealthInput.value) || 1000;
+                
+                if (enemyMaxHealth <= 0) {
+                    enemyMaxHealth = 2000;
+                    enemyHealthInput.value = 2000;
+                }
+                
+                if (enemyCurrentHealth < 0) {
+                    enemyCurrentHealth = 0;
+                    enemyCurrentHealthInput.value = 0;
+                }
+                
+                if (enemyCurrentHealth > enemyMaxHealth) {
+                    enemyCurrentHealth = enemyMaxHealth;
+                    enemyCurrentHealthInput.value = enemyMaxHealth;
+                }
+                
+                // Update enemy health bar
+                updateEnemyHealthBar();
+                
+                // Calculate base damage from ultimate level
+                let base = baseDamage[ultLevel - 1];
+                
+                // Apply Axiom Arcanist bonus if applicable
+                if (hasAxiom) {
+                    base *= (1 + axiomDamageBonus); // 14% increased ultimate damage
+                }
+                
+                // Apply Shojin bonus if applicable
+                if (hasShojin) {
+                    base *= (1 + (0.03 * shojinStacks)); // 3% per stack
+                }
+                
+                // Apply Last Stand bonus if applicable
+                if (hasLastStand) {
+                    const healthPercent = currentHealth / maxHealth;
+                    if (healthPercent <= 0.6) {
+                        // Last Stand gives up to 11% bonus damage when below 60% health
+                        // The lower the health, the higher the bonus
+                        const lastStandBonus = Math.min(0.11, 0.11 * (1 - (healthPercent / 0.6)));
+                        base *= (1 + lastStandBonus);
+                    }
+                }
+                
+                // Calculate missing health damage
+                const missingHealth = enemyMaxHealth - enemyCurrentHealth;
+                const missingHealthDamage = missingHealth * missingHealthPercent[ultLevel - 1];
+                
+                // Apply Press The Attack bonus if applicable
+                let totalDamage = base + missingHealthDamage;
+                if (hasPTA) {
+                    totalDamage *= 1.08; // 8% damage increase
+                }
+                
+                // Check if enemy will be executed
+                let willExecute = totalDamage >= enemyCurrentHealth;
+                let executionMessage = '';
+                
+                // Apply Collector execution threshold if applicable
+                if (hasCollector && enemyCurrentHealth <= enemyMaxHealth * 0.05) {
+                    willExecute = true;
+                    executionMessage = 'Collector will execute below 5% health';
+                }
+                
+                // Update the UI
+                baseDamageOutput.textContent = Math.round(base);
+                missingHealthDamageOutput.textContent = Math.round(missingHealthDamage);
+                totalDamageOutput.textContent = Math.round(totalDamage);
+                
+                if (willExecute) {
+                    executeResult.textContent = 'JUSTICE WILL BE SERVED!';
+                    executeResult.className = 'text-4xl font-bold text-yellow-600';
+                    
+                    if (executionMessage) {
+                        executeDetails.textContent = executionMessage;
+                    } else {
+                        executeDetails.textContent = `Damage (${Math.round(totalDamage)}) exceeds enemy health (${enemyCurrentHealth})`;
+                    }
+                } else {
+                    executeResult.textContent = 'NOT ENOUGH DAMAGE';
+                    executeResult.className = 'text-4xl font-bold text-red-500';
+                    executeDetails.textContent = `Enemy will survive with ${Math.round(enemyCurrentHealth - totalDamage)} health`;
+                }
+                
+                // Add animation effect
+                executeResult.classList.add('animate-pulse');
+                setTimeout(() => {
+                    executeResult.classList.remove('animate-pulse');
+                }, 1000);
+            }
+            
+            // Initial calculation
+            calculateDamage();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93731b32b22627e3',t:'MTc0NTgwNzA5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
